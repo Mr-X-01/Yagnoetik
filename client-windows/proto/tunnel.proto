@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package tunnel;
+
+option go_package = "yagnoetik-vpn-client/proto";
+
+service TunnelService {
+  rpc Connect(stream TunnelFrame) returns (stream TunnelFrame);
+}
+
+message TunnelFrame {
+  bytes data = 1;
+}
