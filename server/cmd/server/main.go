@@ -40,7 +40,11 @@ func main() {
 	
 	// Setup HTTP servers
 	coverAPI := api.NewCoverAPI()
-	adminAPI := api.NewAdminAPI(clientManager, "your-secret-api-key-here")
+	apiKey := os.Getenv("API_KEY")
+	if apiKey == "" {
+		log.Fatal("API_KEY environment variable is required")
+	}
+	adminAPI := api.NewAdminAPI(clientManager, apiKey)
 	
 	// Main HTTPS server (port 443) - combines gRPC and HTTP
 	mainMux := http.NewServeMux()
@@ -85,7 +89,7 @@ func main() {
 	
 	go func() {
 		log.Println("Starting admin server on :8443")
-		if err := adminServer.ListenAndServeTLS("", ""); err != nil && err != http.ErrServerClosed {
+		if err := adminServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Admin server failed: %v", err)
 		}
 	}()
