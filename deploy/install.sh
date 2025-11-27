@@ -49,19 +49,10 @@ fi
 log "📦 Обновление системы..."
 apt update && apt upgrade -y
 
-# Установка необходимых пакетов
+# Установка зависимостей
 log "📦 Установка зависимостей..."
-apt install -y \
-    curl \
-    wget \
-    git \
-    ufw \
-    nginx \
-    certbot \
-    python3-certbot-nginx \
-    htop \
-    unzip \
-    build-essential
+apt update
+apt install -y wget curl unzip nginx certbot python3-certbot-nginx ufw cron htop build-essential
 
 # Установка Go 1.23
 log "🐹 Установка Go 1.23..."
@@ -283,9 +274,18 @@ chmod 600 /opt/yagnoetik/config.env
 log "🔧 Генерация protobuf файлов..."
 cd /opt/yagnoetik/Yagnoetik
 
-# Установка protoc-gen-go плагинов
-sudo -u yagnoetik /usr/local/go/bin/go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-sudo -u yagnoetik /usr/local/go/bin/go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+# Установка protoc-gen-go плагинов с правильным PATH
+export GOPATH=/opt/yagnoetik/go
+export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
+mkdir -p $GOPATH
+
+sudo -u yagnoetik bash -c "
+export GOPATH=/opt/yagnoetik/go
+export PATH=\$PATH:/usr/local/go/bin:\$GOPATH/bin
+mkdir -p \$GOPATH
+/usr/local/go/bin/go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+/usr/local/go/bin/go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+"
 
 # Установка protoc
 if ! command -v protoc &> /dev/null; then
@@ -302,15 +302,23 @@ fi
 
 # Генерация protobuf для сервера
 cd /opt/yagnoetik/Yagnoetik/server
-sudo -u yagnoetik protoc --go_out=. --go_opt=paths=source_relative \
+sudo -u yagnoetik bash -c "
+export GOPATH=/opt/yagnoetik/go
+export PATH=\$PATH:/usr/local/go/bin:\$GOPATH/bin
+protoc --go_out=. --go_opt=paths=source_relative \
     --go-grpc_out=. --go-grpc_opt=paths=source_relative \
     proto/tunnel.proto
+"
 
 # Генерация protobuf для Windows клиента
 cd /opt/yagnoetik/Yagnoetik/client-windows
-sudo -u yagnoetik protoc --go_out=. --go_opt=paths=source_relative \
+sudo -u yagnoetik bash -c "
+export GOPATH=/opt/yagnoetik/go
+export PATH=\$PATH:/usr/local/go/bin:\$GOPATH/bin
+protoc --go_out=. --go_opt=paths=source_relative \
     --go-grpc_out=. --go-grpc_opt=paths=source_relative \
     proto/tunnel.proto
+"
 
 # Создание скрипта для сборки
 cat > /opt/yagnoetik/build.sh << 'EOF'

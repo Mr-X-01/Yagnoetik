@@ -51,7 +51,7 @@ func main() {
 	
 	// Create combined server that handles both HTTP and gRPC
 	mainServer := &http.Server{
-		Addr: ":443",
+		Addr: ":8444",
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.ProtoMajor == 2 && r.Header.Get("Content-Type") == "application/grpc" {
 				grpcServer.ServeHTTP(w, r)
@@ -77,7 +77,7 @@ func main() {
 	
 	// Start servers
 	go func() {
-		log.Println("Starting main server on :443")
+		log.Println("Starting main server on :8444")
 		if err := mainServer.ListenAndServeTLS("", ""); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Main server failed: %v", err)
 		}

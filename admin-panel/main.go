@@ -339,6 +339,6 @@ func main() {
 	r.HandleFunc("/", panel.indexHandler).Methods("GET")
 	r.PathPrefix("/api/").HandlerFunc(panel.proxyHandler)
 
-	log.Println("Admin panel starting on :8080")
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Println("Admin panel starting on :8081")
+	log.Fatal(http.ListenAndServe(":8081", r))
 }
