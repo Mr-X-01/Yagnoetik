@@ -333,7 +333,7 @@ func (a *AdminPanel) proxyHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	apiURL := os.Getenv("SERVER_URL")
 	if apiURL == "" {
-		apiURL = "http://localhost:8443"
+		apiURL = "https://localhost:8443"
 	}
 	
 	apiKey := os.Getenv("API_KEY")
