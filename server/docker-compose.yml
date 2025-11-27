@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  yagnoetik-server:
+    build: .
+    ports:
+      - "443:443"
+      - "8443:8443"
+    volumes:
+      - ./server.crt:/root/server.crt:ro
+      - ./server.key:/root/server.key:ro
+    environment:
+      - API_KEY=your-secret-api-key-change-this
+    restart: unless-stopped
+    
+  admin-panel:
+    build: ../admin-panel
+    ports:
+      - "8080:8080"
+    environment:
+      - API_URL=https://yagnoetik-server:8443
+      - API_KEY=your-secret-api-key-change-this
+    depends_on:
+      - yagnoetik-server
+    restart: unless-stopped

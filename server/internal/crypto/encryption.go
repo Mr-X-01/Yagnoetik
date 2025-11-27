@@ -1,0 +1,57 @@
+package crypto
+
+import (
+	"crypto/cipher"
+	"crypto/rand"
+	"errors"
+	"golang.org/x/crypto/chacha20poly1305"
+)
+
+type Cipher struct {
+	aead cipher.AEAD
+}
+
+func NewCipher(key []byte) (*Cipher, error) {
+	if len(key) != 32 {
+		return nil, errors.New("key must be 32 bytes")
+	}
+	
+	aead, err := chacha20poly1305.NewX(key)
+	if err != nil {
+		return nil, err
+	}
+	
+	return &Cipher{aead: aead}, nil
+}
+
+func (c *Cipher) Encrypt(plaintext []byte) ([]byte, error) {
+	nonce := make([]byte, c.aead.NonceSize())
+	if _, err := rand.Read(nonce); err != nil {
+		return nil, err
+	}
+	
+	ciphertext := c.aead.Seal(nonce, nonce, plaintext, nil)
+	return ciphertext, nil
+}
+
+func (c *Cipher) Decrypt(ciphertext []byte) ([]byte, error) {
+	if len(ciphertext) < c.aead.NonceSize() {
+		return nil, errors.New("ciphertext too short")
+	}
+	
+	nonce := ciphertext[:c.aead.NonceSize()]
+	encrypted := ciphertext[c.aead.NonceSize():]
+	
+	plaintext, err := c.aead.Open(nil, nonce, encrypted, nil)
+	if err != nil {
+		return nil, err
+	}
+	
+	return plaintext, nil
+}
+
+func GenerateKey() []byte {
+	key := make([]byte, 32)
+	rand.Read(key)
+	return key
+}
