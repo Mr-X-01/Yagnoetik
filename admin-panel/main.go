@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -330,8 +331,15 @@ func (a *AdminPanel) proxyHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	apiURL := "https://your-server.com:8443"
-	apiKey := "your-secret-api-key-here"
+	apiURL := os.Getenv("SERVER_URL")
+	if apiURL == "" {
+		apiURL = "http://localhost:8443"
+	}
+	
+	apiKey := os.Getenv("API_KEY")
+	if apiKey == "" {
+		log.Fatal("API_KEY environment variable is required")
+	}
 
 	panel := NewAdminPanel(apiURL, apiKey)
 
