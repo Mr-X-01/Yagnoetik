@@ -85,7 +85,7 @@ func main() {
 	
 	go func() {
 		log.Println("Starting admin server on :8443")
-		if err := adminServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := adminServer.ListenAndServeTLS("", ""); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Admin server failed: %v", err)
 		}
 	}()
