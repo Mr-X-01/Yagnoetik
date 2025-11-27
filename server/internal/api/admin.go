@@ -37,11 +37,11 @@ func (a *AdminAPI) SetupRoutes() *mux.Router {
 	r := mux.NewRouter()
 	r.Use(a.authMiddleware)
 	
-	r.HandleFunc("/admin/clients", a.createClient).Methods("POST")
-	r.HandleFunc("/admin/clients", a.listClients).Methods("GET")
-	r.HandleFunc("/admin/clients/{uuid}", a.deleteClient).Methods("DELETE")
-	r.HandleFunc("/admin/clients/{uuid}/block", a.blockClient).Methods("POST")
-	r.HandleFunc("/admin/clients/{uuid}/unblock", a.unblockClient).Methods("POST")
+	r.HandleFunc("/api/clients", a.createClient).Methods("POST")
+	r.HandleFunc("/api/clients", a.listClients).Methods("GET")
+	r.HandleFunc("/api/clients/{uuid}", a.deleteClient).Methods("DELETE")
+	r.HandleFunc("/api/clients/{uuid}/block", a.blockClient).Methods("POST")
+	r.HandleFunc("/api/clients/{uuid}/unblock", a.unblockClient).Methods("POST")
 	
 	return r
 }
